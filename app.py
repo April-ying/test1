@@ -1,14 +1,15 @@
 # 統整版 用這個啟動
 from flask import Flask, render_template,request, jsonify
-from flask_socketio import SocketIO, send
+from flask_socketio import SocketIO, send,emit
 import base64
 from PIL import Image
 from io import BytesIO
 # 引入 Flask 和 PyMongo 套件
-from flask_pymongo import PyMongo
-from flask_httpauth import HTTPBasicAuth
+# from flask_pymongo import PyMongo
+# from flask_httpauth import HTTPBasicAuth
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 # 設定 MongoDB 連線資訊
 # app.config["MONGO_URI"] = "mongodb://localhost:27017/dorm"
 # mongo = PyMongo(app)
@@ -49,7 +50,7 @@ def confirm():
 
 @app.route('/generic')
 def generic():
-    return render_template('generic.html')
+    return render_template('handwrite.html')
 
 @app.route('/elements')
 def elements():
@@ -62,6 +63,10 @@ def contact():
 @app.route('/qrcodehandwrite')
 def handwrite():
     return render_template('handwrite.html')
+
+@app.route('/show')
+def show():
+    return render_template('show.html')
 
 # @app.route('/show_image')
 # def image():
@@ -90,14 +95,28 @@ def upload_image():
     # 最後使用 Pillow 的 Image.open() 方法打開圖片，生成一個 Image
     image = Image.open(BytesIO(base64.b64decode(image_data)))
     image.save('uploaded_image.png')  # 將打開的圖片對象保存為 PNG 格式的圖片檔案
-
+    socketio.emit('image_uploaded', {'url': '/show'})
     return jsonify({'message': 'Image uploaded successfully'})
 
 # @socketio.on('button_press')
 # def handle_button_press(msg):
 #     print('Button Pressed:', msg)
 #     socketio.emit('button_press', msg)
-    
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected')
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected')
+
+@socketio.on('start_drawing')
+def handle_start_drawing():
+    emit('start_drawing', broadcast=True)
+
+@socketio.on('submit_drawing')
+def handle_submit_drawing(image_data):
+    emit('display_drawing', image_data, broadcast=True)
 
 if __name__ == '__main__':
     # socketio.run(app)
