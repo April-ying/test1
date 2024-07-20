@@ -6,6 +6,8 @@ from sqlalchemy import text
 import base64
 from PIL import Image
 from io import BytesIO
+from sqlalchemy.sql.expression import func
+import random
 
 app = Flask(__name__)
 
@@ -52,10 +54,12 @@ def confirm():
 
 @app.route('/generic')
 def generic():
-    colorblind_test=db.session.query(pic).filter(pic.id==1)
+    random_id = random.randint(1, 10)
+    colorblind_test=db.session.query(pic).filter(pic.id==random_id)
     for result in colorblind_test:
         print(result.addr)
-    return render_template('handwrite.html',data=colorblind_test.addr)
+    
+    return render_template('handwrite.html',data=result.addr)
 
 @app.route('/elements')
 def elements():
