@@ -1,12 +1,34 @@
 # 統整版 用這個啟動
 from flask import Flask, render_template,request, jsonify
 from flask_socketio import SocketIO, send,emit
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 import base64
 from PIL import Image
 from io import BytesIO
 
 app = Flask(__name__)
+
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://april0909:c7CslksYkeusqcvAkMecoFDQPIFuiPKp@dpg-cqcj0sg8fa8c73crb3u0-a.oregon-postgres.render.com/data_uire"
+
+db = SQLAlchemy(app)
 socketio = SocketIO(app)
+
+with app.app_context():
+    db.create_all()
+    
+#所有圖片
+class pic(db.Model):
+    __tablename__='cblind_spot_pic'#色盲點圖圖片
+    id=db.Column(db.Integer,primary_key=True)
+    addr=db.Column(db.String(150))
+
+    def __init__(self,addr):
+        self.addr=addr
+
+
 
 @app.route('/')
 def index():
@@ -30,7 +52,10 @@ def confirm():
 
 @app.route('/generic')
 def generic():
-    return render_template('handwrite.html')
+    colorblind_test=db.session.query(pic).filter(pic.id==1)
+    for result in colorblind_test:
+        print(result.addr)
+    return render_template('handwrite.html',data=colorblind_test.addr)
 
 @app.route('/elements')
 def elements():
@@ -38,7 +63,7 @@ def elements():
 
 @app.route('/contact')
 def contact():
-    return render_template('contact.html')
+    return render_template('index1.html')
 
 @app.route('/qrcodehandwrite')
 def handwrite():
@@ -47,6 +72,11 @@ def handwrite():
 @app.route('/show')
 def show():
     return render_template('show.html')
+
+#確定是否以掃描QRcode進入色盲點圖測驗的頁面
+@app.route('/color_blind_spot_map')
+def color_blind_spot_map():
+    return render_template('color_blind_spot_map.html')
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
@@ -62,7 +92,7 @@ def upload_image():
     # 最後使用 Pillow 的 Image.open() 方法打開圖片，生成一個 Image
     image = Image.open(BytesIO(base64.b64decode(image_data)))
     image.save('uploaded_image.png')  # 將打開的圖片對象保存為 PNG 格式的圖片檔案
-    socketio.emit('image_uploaded', {'url': '/show'})
+    # socketio.emit('image_uploaded', {'url': '/show'})
     return jsonify({'message': 'Image uploaded successfully'})
 
 if __name__ == '__main__':
