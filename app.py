@@ -18,8 +18,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://april0909:c7CslksYkeusqcvA
 db = SQLAlchemy(app)
 socketio = SocketIO(app)
 
-with app.app_context():
-    db.create_all()
     
 #所有圖片
 class pic(db.Model):
@@ -52,6 +50,7 @@ def choose():
 def confirm():
     return render_template('myopia.html')
 
+
 @app.route('/generic')
 def generic():
     random_id = random.randint(1, 10)
@@ -60,6 +59,18 @@ def generic():
         print(result.addr)
     
     return render_template('handwrite.html',data=result.addr)
+
+#切換下一題
+@app.route('/next-image')
+def next_image():
+    random_id = random.randint(1, 10)
+    colorblind_test = db.session.query(pic).filter(pic.id == random_id)
+    for result in colorblind_test:
+        print(result.addr)
+    if colorblind_test:
+        return jsonify({'nextImageUrl': result.addr})
+    else:
+        return jsonify({'error': 'No image found'}), 404
 
 @app.route('/elements')
 def elements():
