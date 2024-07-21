@@ -18,7 +18,8 @@
         }
         canvas {
             /* background-image: url("static/colorblind_image/2.png"); */
-            background-image: url({{data}});
+            /* background-image: url({{data}}); */
+            background-image:url(data:image/png;base64,{{data}});
             background-size: cover;
             border: 2px solid black;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
@@ -136,7 +137,7 @@
                 body: JSON.stringify({ image: dataURL })    // 將陣列 coordinates 轉換為 JSON 字串
             })
             .then(response => response.json())  // 當伺服器回應返回時，首先將其解析為 JSON 格式
-            // 將訪問 data 的 message 屬性，並將其輸出到瀏覽器的控制台中
+            // 將訪問data的message屬性，並將其輸出到瀏覽器的控制台中
             .then(data => {
                 console.log(data);
                 completedQuestions++;
@@ -161,6 +162,7 @@
         .then(data => {
             // 使用返回的下一張圖片的 URL 更新 canvas 的背景
             if (data.nextImageUrl) {
+                context.clearRect(0, 0, canvas.width, canvas.height); // 清除畫布上的所有內容
                 canvas.style.backgroundImage = 'url(' + data.nextImageUrl + ')';
             } else {
                 console.error('Error: no image URL returned');

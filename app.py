@@ -11,7 +11,6 @@ import random
 
 app = Flask(__name__)
 
-
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://april0909:c7CslksYkeusqcvAkMecoFDQPIFuiPKp@dpg-cqcj0sg8fa8c73crb3u0-a.oregon-postgres.render.com/data_uire"
 
@@ -21,12 +20,21 @@ socketio = SocketIO(app)
     
 #所有圖片
 class pic(db.Model):
-    __tablename__='cblind_spot_pic'#色盲點圖圖片
+    __tablename__='images'#色盲點圖圖片
     id=db.Column(db.Integer,primary_key=True)
-    addr=db.Column(db.String(150))
+    image_data=db.Column(db.String(150))
 
-    def __init__(self,addr):
-        self.addr=addr
+    def __init__(self,image_data):
+        self.image_data=image_data
+
+class ans(db.Model):
+    __tablename__='user_ans'  # 使用者答案
+    id = db.Column(db.Integer, primary_key=True)
+    image_data = db.Column(db.LargeBinary)  # 新增的字段來存儲圖片數據
+
+    def __init__(self, image_data=None):
+        self.image_data = image_data
+
 
 
 
@@ -53,22 +61,43 @@ def confirm():
 
 @app.route('/generic')
 def generic():
-    random_id = random.randint(1, 10)
+    # random_id = random.randint(1, 10)
+    # colorblind_test=db.session.query(pic).filter(pic.id==random_id)
+    # for result in colorblind_test:
+    #     print(result.addr)
+    
+    # return render_template('handwrite.html',data=result.addr)
+    random_id = random.randint(1, 20)
     colorblind_test=db.session.query(pic).filter(pic.id==random_id)
     for result in colorblind_test:
-        print(result.addr)
-    
-    return render_template('handwrite.html',data=result.addr)
+        print(result.image_data)
+
+    #從資料庫中取出二進制數據並轉換為 Base64 編碼
+    base64_data = base64.b64encode(result.image_data).decode('utf-8')
+    return render_template('handwrite.html',data=base64_data)
 
 #切換下一題
 @app.route('/next-image')
 def next_image():
-    random_id = random.randint(1, 10)
+    # random_id = random.randint(1, 10)
+    # colorblind_test = db.session.query(pic).filter(pic.id == random_id)
+    # for result in colorblind_test:
+    #     print(result.addr)
+    # if colorblind_test:
+    #     return jsonify({'nextImageUrl': result.addr})
+    # else:
+    #     return jsonify({'error': 'No image found'}), 404
+
+    random_id = random.randint(1, 20)
     colorblind_test = db.session.query(pic).filter(pic.id == random_id)
     for result in colorblind_test:
-        print(result.addr)
+        print(result.image_data)
+    
+    #從資料庫中取出二進制數據並轉換為 Base64 編碼
+    base64_data = base64.b64encode(result.image_data).decode('utf-8')
+    next_image_url = f"data:image/jpeg;base64,{base64_data}"
     if colorblind_test:
-        return jsonify({'nextImageUrl': result.addr})
+        return jsonify({'nextImageUrl': next_image_url})
     else:
         return jsonify({'error': 'No image found'}), 404
 
@@ -102,11 +131,19 @@ def upload_image():
     
     image_data = data['image']  # 從 JSON 數據中提取名為 'image' 的 key 所對應的 value(前端傳來的圖片資料Base64格式字串)
     image_data = image_data.replace('data:image/png;base64,', '')  # 去除了 DataURL 的前綴部分
+    binary_image_data = base64.b64decode(image_data)  # 將經過處理的 Base64 字符串解碼成二進制數據
     # 將經過處理的 Base64 字符串解碼成二進制數據
     # 然後使用 BytesIO 將其包裝成 BytesIO 對象
     # 最後使用 Pillow 的 Image.open() 方法打開圖片，生成一個 Image
-    image = Image.open(BytesIO(base64.b64decode(image_data)))
-    image.save('uploaded_image.png')  # 將打開的圖片對象保存為 PNG 格式的圖片檔案
+
+    # 儲存圖片到資料庫
+    new_image = ans(image_data=binary_image_data)
+    db.session.add(new_image)
+    db.session.commit()
+
+
+    # image = Image.open(BytesIO(base64.b64decode(image_data)))
+    # image.save('uploaded_image.png')  # 將打開的圖片對象保存為 PNG 格式的圖片檔案
     # socketio.emit('image_uploaded', {'url': '/show'})
     return jsonify({'message': 'Image uploaded successfully'})
 
