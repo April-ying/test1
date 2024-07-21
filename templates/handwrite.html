@@ -1,3 +1,4 @@
+<!-- 手機色盲點圖作答頁面 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,8 +18,6 @@
             background-color: #f0f0f0;
         }
         canvas {
-            /* background-image: url("static/colorblind_image/2.png"); */
-            /* background-image: url({{data}}); */
             background-image:url(data:image/png;base64,{{data}});
             background-size: cover;
             border: 2px solid black;
@@ -59,9 +58,26 @@
 <script>
     var totalQuestions = 10;
     var completedQuestions = 0;
+    // 在窗口加载时调整画布大小
+    window.addEventListener('resize', resizeCanvas);
 
+    function resizeCanvas() {
+        // 保存当前 Canvas 的背景图像
+    var currentBackgroundImage = canvas.style.backgroundImage;
+
+    // 调整 Canvas 尺寸
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+
+    // 重新设置背景图像
+    canvas.style.backgroundImage = currentBackgroundImage;
+    }
+
+    
     // 更新狀態顯示
     function updateStatus() {
+        // 初始化时调用
+        resizeCanvas();
         document.getElementById('status').innerText = '完成題數: ' + completedQuestions + '/' + totalQuestions;
     }
 
@@ -120,8 +136,6 @@
     // 結束繪圖
     function stopDrawing() {
         isDrawing = false;
-        //console.log(lineCoordinates);
-        //displayCoordinates();
         lineCoordinates = [];
     }
 

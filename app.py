@@ -8,6 +8,8 @@ from PIL import Image
 from io import BytesIO
 from sqlalchemy.sql.expression import func
 import random
+import cv2
+import numpy as np
 
 app = Flask(__name__)
 
@@ -17,7 +19,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://april0909:c7CslksYkeusqcvA
 db = SQLAlchemy(app)
 socketio = SocketIO(app)
 
-    
+
+# 連線資料庫的table
 #所有圖片
 class pic(db.Model):
     __tablename__='images'#色盲點圖圖片
@@ -59,14 +62,9 @@ def confirm():
     return render_template('myopia.html')
 
 
+#暫時是色盲點圖測驗的頁面，因為連線還沒用好
 @app.route('/generic')
 def generic():
-    # random_id = random.randint(1, 10)
-    # colorblind_test=db.session.query(pic).filter(pic.id==random_id)
-    # for result in colorblind_test:
-    #     print(result.addr)
-    
-    # return render_template('handwrite.html',data=result.addr)
     random_id = random.randint(1, 20)
     colorblind_test=db.session.query(pic).filter(pic.id==random_id)
     for result in colorblind_test:
@@ -75,19 +73,11 @@ def generic():
     #從資料庫中取出二進制數據並轉換為 Base64 編碼
     base64_data = base64.b64encode(result.image_data).decode('utf-8')
     return render_template('handwrite.html',data=base64_data)
+    
 
 #切換下一題
 @app.route('/next-image')
 def next_image():
-    # random_id = random.randint(1, 10)
-    # colorblind_test = db.session.query(pic).filter(pic.id == random_id)
-    # for result in colorblind_test:
-    #     print(result.addr)
-    # if colorblind_test:
-    #     return jsonify({'nextImageUrl': result.addr})
-    # else:
-    #     return jsonify({'error': 'No image found'}), 404
-
     random_id = random.randint(1, 20)
     colorblind_test = db.session.query(pic).filter(pic.id == random_id)
     for result in colorblind_test:
