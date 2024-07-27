@@ -30,6 +30,7 @@ class pic(db.Model):
     def __init__(self,image_data):
         self.image_data=image_data
 
+#色盲點圖使用者答案
 class ans(db.Model):
     __tablename__='user_ans'  # 使用者答案
     id = db.Column(db.Integer, primary_key=True)
@@ -37,8 +38,6 @@ class ans(db.Model):
 
     def __init__(self, image_data=None):
         self.image_data = image_data
-
-
 
 
 @app.route('/')
@@ -66,7 +65,7 @@ def confirm():
 @app.route('/generic')
 def generic():
     random_id = random.randint(1, 20)
-    colorblind_test=db.session.query(pic).filter(pic.id==random_id)
+    colorblind_test=db.session.query(pic).filter(pic.id==random_id)#從資料庫取出題目圖片
     for result in colorblind_test:
         print(result.image_data)
 
@@ -99,7 +98,7 @@ def elements():
 def contact():
     return render_template('index1.html')
 
-@app.route('/qrcodehandwrite')
+@app.route('/handwrite')
 def handwrite():
     return render_template('handwrite.html')
 
@@ -132,9 +131,9 @@ def upload_image():
     db.session.commit()
 
 
-    # image = Image.open(BytesIO(base64.b64decode(image_data)))
-    # image.save('uploaded_image.png')  # 將打開的圖片對象保存為 PNG 格式的圖片檔案
-    # socketio.emit('image_uploaded', {'url': '/show'})
+    image = Image.open(BytesIO(base64.b64decode(image_data)))
+    image.save('uploaded_image.png')  # 將打開的圖片對象保存為 PNG 格式的圖片檔案
+    socketio.emit('image_uploaded', {'url': '/show'})
     return jsonify({'message': 'Image uploaded successfully'})
 
 if __name__ == '__main__':
