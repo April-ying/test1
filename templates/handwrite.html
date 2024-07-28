@@ -123,14 +123,16 @@
 
     function saveImage() {
         if (confirm("您確定要送出嗎？")) {
-            var dataURL = canvas.toDataURL();
-            fetch('/upload', {
+            var dataURL = canvas.toDataURL(); //將畫布的内容转換成一个Base64編碼的字符串
+            fetch('/upload', { //通過fetch API以POST請求的方式發送到 /upload端點
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                // 發送的請求包含了一個JSON對象，其中包含了名為'image'的鍵和Base64編碼的圖片數據作為值
                 body: JSON.stringify({ image: dataURL })
             })
+            // 處理伺服器返回的響應，將響應數據轉換成JSON格式
             .then(response => response.json())
             .then(data => {
                 console.log(data);
@@ -163,6 +165,9 @@
             console.error('Error loading next image:', error);
         });
     }
+
+    // 初始加载第一张图片
+    loadNextImage();
     updateStatus();
 </script>
 

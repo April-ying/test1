@@ -74,6 +74,17 @@ def next_image():
         return jsonify({'nextImageUrl': next_image_url})
     else:
         return jsonify({'error': 'No image found'}), 404
+    
+# @app.route('/next-image')
+# def next_image():
+#     random_id = random.randint(1, 20)
+#     colorblind_test = db.session.query(pic).filter(pic.id == random_id).first()
+#     if colorblind_test:
+#         base64_data = base64.b64encode(colorblind_test.image_data).decode('utf-8')
+#         next_image_url = f"data:image/jpeg;base64,{base64_data}"
+#         return jsonify({'nextImageUrl': next_image_url})
+#     else:
+#         return jsonify({'error': 'No image found'}), 404
 
 @app.route('/elements')
 def elements():
