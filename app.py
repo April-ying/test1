@@ -86,9 +86,9 @@ def next_image():
 #     else:
 #         return jsonify({'error': 'No image found'}), 404
 
-@app.route('/elements')
+@app.route('/ishihara-test')
 def elements():
-    return render_template('elements.html')
+    return render_template('ishihara-test.html')
 
 @app.route('/contact')
 def contact():
