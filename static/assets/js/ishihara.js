@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
       options.width = canvas.width;
       options.height = canvas.height;
 
-      worker = new Worker('worker.js');
+      worker = new Worker('static/assets/js/worker.js');
       worker.postMessage(options);
 
       worker.addEventListener('message', function(e) {
