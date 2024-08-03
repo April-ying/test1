@@ -79,15 +79,24 @@ def next_image():
 def elements():
     return render_template('ishihara-test.html')
 
-@app.route('/contact')
-def contact():
-    return render_template('index1.html')
+@app.route('/comfirm_colordot')
+def comfirm_colordot():
+    return render_template('comfirm_colordot.html')
+
+# @app.route('/handwrite')
+# def handwrite():
+#     user_uuid = request.args.get('user')  # 獲取查詢參數中的 user UUID
+#     if user_uuid:
+#         # 可以在這裡進行一些檢查或其他操作，比如驗證 UUID 格式
+#         return render_template('handwrite.html', user_uuid=user_uuid)
+#     else:
+#         return "User UUID not provided", 400
 
 @app.route('/handwrite')
 def handwrite():
-    user_uuid = request.args.get('user')  # 獲取查詢參數中的 user UUID
+    user_uuid = request.args.get('session')  # 从查询参数中获取 session ID
     if user_uuid:
-        # 可以在這裡進行一些檢查或其他操作，比如驗證 UUID 格式
+        # 在这里可以做进一步的处理，比如验证 session ID
         return render_template('handwrite.html', user_uuid=user_uuid)
     else:
         return "User UUID not provided", 400
@@ -119,9 +128,15 @@ def upload_image():
     socketio.emit('image_uploaded', {'url': '/show'})
     return jsonify({'message': 'Image uploaded successfully'})
 
+# @app.route('/generate-url', methods=['GET'])
+# def generate_url():
+#     unique_url = f"{request.host_url}handwrite?user={uuid.uuid4()}"
+#     session['unique_url'] = unique_url  # 存儲到會話中
+#     return jsonify({'url': unique_url})
+
 @app.route('/generate-url', methods=['GET'])
 def generate_url():
-    unique_url = f"{request.host_url}handwrite?user={uuid.uuid4()}"
+    unique_url = f"{request.host_url}handwrite?session={uuid.uuid4()}"
     session['unique_url'] = unique_url  # 存儲到會話中
     return jsonify({'url': unique_url})
 
