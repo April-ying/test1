@@ -22,9 +22,11 @@
             flex-direction: column;
             align-items: center;
             background-color: #ffffff;
-            padding: 20px;
+            padding: 10px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
         }
         canvas {
             background-image: url(data:image/png;base64,{{data}});
@@ -32,19 +34,18 @@
             border: 2px solid #004d40;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 90%;
-            max-width: 500px;
+            width: 100%;
             height: auto;
-            aspect-ratio: 1;
+            aspect-ratio: 1 / 1; /* 保持正方形 */
             margin-bottom: 20px;
         }
         button {
-            padding: 12px 25px;
-            font-size: 18px;
+            padding: 10px 20px;
+            font-size: 16px;
             color: #fff;
             background-color: #00796b;
             border: none;
-            border-radius: 25px;
+            border-radius: 20px;
             cursor: pointer;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             transition: background-color 0.3s ease;
@@ -53,8 +54,8 @@
             background-color: #004d40;
         }
         .status {
-            font-size: 20px;
-            margin-bottom: 20px;
+            font-size: 16px;
+            margin-bottom: 10px;
             font-weight: bold;
         }
     </style>
@@ -63,7 +64,7 @@
 
 <div class="container">
     <div class="status" id="status">完成題數: 0/10</div>
-    <canvas id="drawingCanvas" width="500" height="500"></canvas>
+    <canvas id="drawingCanvas"></canvas>
     <button onclick="saveImage()">確認送出</button>
 </div>
 
@@ -73,9 +74,10 @@
     window.addEventListener('resize', resizeCanvas);
 
     function resizeCanvas() {
+        var canvas = document.getElementById('drawingCanvas');
         var currentBackgroundImage = canvas.style.backgroundImage;
         canvas.width = canvas.clientWidth;
-        canvas.height = canvas.clientHeight;
+        canvas.height = canvas.clientWidth;  // 保持 canvas 是正方形
         canvas.style.backgroundImage = currentBackgroundImage;
     }
 
@@ -112,7 +114,7 @@
         e.preventDefault();
         if (!isDrawing) return;
 
-        context.lineWidth = 12;
+        context.lineWidth = 8;
         context.lineCap = 'round';
         context.lineJoin = 'round';
         context.strokeStyle = 'black';
@@ -177,8 +179,11 @@
         });
     }
 
-    loadNextImage();
-    updateStatus();
+    window.onload = function() {
+        loadNextImage();
+        updateStatus();
+        resizeCanvas(); // 确保初始加载时 canvas 适应屏幕大小
+    };
 </script>
 
 </body>
