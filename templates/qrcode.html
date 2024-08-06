@@ -1,3 +1,4 @@
+<!-- 掃描進入頁面的畫面 -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -85,13 +86,19 @@
     });
 
     // 收到更新頁面消息時的處理
-    socket.on('updatePage', function(message) {
-        var urlParams = new URLSearchParams(window.location.search);
-        var sessionID = urlParams.get('session');
-        if (message.sessionID === sessionID) {
-            console.log('Session ID matched. Updating the page.');
-            window.location.href = 'color_blind_spot_map.html'; // 更新到新的頁面
-        }
+    socket.on('confirmDrawing', function(message) {
+        console.log('Received message:'+ JSON.stringify (message));
+
+        // 新的URL
+        var newUrl = window.location.origin + '/color_blind_spot_map.html?session=' + message.urlSuffix;
+
+        // debug
+        alert('New URL: ' + newUrl);
+        // 直接導航到新的 URL
+        // window.location.href = newUrl;
+        setTimeout(function() {
+            window.location.href = newUrl;
+        }, 3000);  // 3秒后跳转
     });
 
     // WebSocket 連接關閉時的處理

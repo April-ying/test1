@@ -15,7 +15,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://april0909:c7CslksYkeusqcvAkMecoFDQPIFuiPKp@dpg-cqcj0sg8fa8c73crb3u0-a.oregon-postgres.render.com/data_uire"
 
 db = SQLAlchemy(app)
-socketio = SocketIO(app)
+socketio = SocketIO(app , cors_allowed_origins="*") # cors_allowed_origins="*" 可以允許任何来源的跨域請求。
 
 # 連線資料庫的table
 class pic(db.Model):
@@ -116,6 +116,7 @@ def handwrite():
         return "User UUID not provided", 400
 
 
+
 @app.route('/show')
 def show():
     return render_template('show.html')
@@ -139,23 +140,21 @@ def generate_url():
     return jsonify({'url': unique_url})
 
 @socketio.on('confirmDrawing')
-def handle_confirm_drawing(json):
-    session_id = json.get('sessionID')
-    emit('updatePage', {'sessionID': session_id}, broadcast=True)
+def handle_confirm_drawing(data):
+    print("Received confirmDrawing event")  # 确认事件触发
+    url_suffix = data.get('urlSuffix')
+    if url_suffix:
+        print("=======")
+        print(f'Received urlSuffix: {url_suffix}')
+        socketio.emit('confirmDrawing', {'urlSuffix': url_suffix}, broadcast=True)
+    else:
+        print('No URL suffix provided.')
 
 @app.route('/generate-url-qrcode')
 def generate_url_qrcode():
     session_id = str(uuid.uuid4())  # 生成唯一的sessionID
     unique_url = f"{request.host_url}comfirm_colordot?session={session_id}"
     return jsonify(url=unique_url)
-
-@app.route('/get-url', methods=['GET'])
-def get_url():
-    unique_url = session.get('unique_url', None)  # 從會話中獲取 URL
-    if unique_url:
-        return jsonify({'url': unique_url})
-    else:
-        return jsonify({'error': 'URL not found'}), 404
 
 @socketio.on('connect')
 def handle_connect():
