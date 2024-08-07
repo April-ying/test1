@@ -75,6 +75,7 @@ def next_image():
     else:
         return jsonify({'error': 'No image found'}), 404
     
+#點圖製作功能頁面
 @app.route('/ishihara-test')
 def elements():
     return render_template('ishihara-test.html')
@@ -105,7 +106,6 @@ def upload_image():
 
 # -------------------以下還沒debug結束---------------------- #
 
-
 @app.route('/handwrite')
 def handwrite():
     user_uuid = request.args.get('session')  # 从查询参数中获取 session ID
@@ -115,24 +115,20 @@ def handwrite():
     else:
         return "User UUID not provided", 400
 
-
+@app.route('/color_blind_spot_map')
+def color_blind_spot_map():
+    user_uuid = request.args.get('session')  # 从查询参数中获取 session ID
+    if user_uuid:
+        # 在这里可以做进一步的处理，比如验证 session ID
+        return render_template('/color_blind_spot_map.html', user_uuid=user_uuid)
+    else:
+        return "User UUID not provided", 400
 
 @app.route('/show')
 def show():
     return render_template('show.html')
 
-@app.route('/color_blind_spot_map')
-def color_blind_spot_map():
-    return render_template('color_blind_spot_map.html')
-
-@app.route('/confirm', methods=['POST'])
-def confirm():
-    data = request.get_json()
-    session_id = data.get('sessionID')
-    # 发送 WebSocket 消息
-    socketio.emit('updatePage', {'sessionID': session_id})
-    return jsonify({'success': True})
-
+# 產生唯一的網址 handwrite?session=
 @app.route('/generate-url', methods=['GET'])
 def generate_url():
     unique_url = f"{request.host_url}handwrite?session={uuid.uuid4()}"
@@ -146,7 +142,7 @@ def handle_confirm_drawing(data):
     if url_suffix:
         print("=======")
         print(f'Received urlSuffix: {url_suffix}')
-        socketio.emit('confirmDrawing', {'urlSuffix': url_suffix}, broadcast=True)
+        emit('confirm', {'urlSuffix': url_suffix},broadcast=True)
     else:
         print('No URL suffix provided.')
 
@@ -170,4 +166,5 @@ def handle_start_session(data):
     print(f"Session started: {session_id}")
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # app.run(host='0.0.0.0', port=5000, debug=True)
+    socketio.run(app,host='0.0.0.0', port=5000, debug=True)

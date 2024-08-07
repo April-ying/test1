@@ -43,7 +43,8 @@
     </style>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script>
-        var socket = io();
+        var socket = io.connect('https://test3-oq3k.onrender.com');
+        // var socket = io();
 
         socket.on('connect', function() {
             console.log('WebSocket 連接已打開');
@@ -64,15 +65,17 @@
                 .then(data => {
                     // 檢查response數據中是否包含 URL
                     if (data.url) {
-                        // 將瀏覽器重新定向到生成的唯一URL
-                        window.location.href = data.url;
+                        
                         // 獲取 URL 的后缀部分 從=的地方切 http://192.168.0.155:5000/comfirm_colordot?session=705c8991-e61c-4600-a5f7-f566330a6a5d
                         var urlSuffix = data.url.split('=').pop();
-                        alert('Sent urlSuffix: ' + urlSuffix);  //debug
-                        console.log('Emitting confirmDrawing with urlSuffix:', urlSuffix);
+                        alert('Sent1 urlSuffix: ' + urlSuffix);  //debug
+                        // console.log('Emitting confirmDrawing with urlSuffix:', urlSuffix);
                         // 發送 WebSocket 消息通知 QRcode頁面更新
-                        socket.emit('confirmDrawing', { 'urlSuffix': urlSuffix });
-                        alert('Sent urlSuffix:'+ urlSuffix); 
+                        socket.emit('confirmDrawing', {'urlSuffix': urlSuffix});
+                        alert('Sent2 urlSuffix:'+ urlSuffix); 
+
+                        // 將瀏覽器重新定向到生成的唯一URL
+                        window.location.href = data.url;
                     } else {
                         // 如果没有 URL，在控制台中輸出錯誤
                         console.error('Error generating URL');
@@ -82,7 +85,8 @@
                     // 如果請求過程中出現錯誤，則在控制台中輸出錯誤訊息
                     console.error('Error:', error);
                 });
-        }
+         }
+        
 
     </script>
 </head>
