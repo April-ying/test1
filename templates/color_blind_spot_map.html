@@ -4,7 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>色盲點圖測驗題目(電腦端)</title>
-    終於成功
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #e0f7fa;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+        }
+        canvas {
+            background-image: url(data:image/png;base64,{{data}});
+            background-size: cover;
+            border: 2px solid #004d40;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1 / 1; /* 保持正方形 */
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #00796b;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #004d40;
+        }
+        .status {
+            font-size: 16px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+    </style>
 
 </head>
+<body>
+
+    <div class="container">
+        <div class="status" id="status">完成題數: 0/10</div>
+    </div>
+    <script>
+        var totalQuestions = 10;
+        var completedQuestions = 0;
+        window.addEventListener('resize', resizeCanvas);
+    
+        function resizeCanvas() {
+            var canvas = document.getElementById('drawingCanvas');
+            var currentBackgroundImage = canvas.style.backgroundImage;
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientWidth;  // 保持 canvas 是正方形
+            canvas.style.backgroundImage = currentBackgroundImage;
+        }
+        
+        var canvas = document.getElementById('drawingCanvas');
+        var context = canvas.getContext('2d');
+
+        function updateStatus() {
+            resizeCanvas();
+            document.getElementById('status').innerText = '完成題數: ' + completedQuestions + '/' + totalQuestions;
+        }
+
+        window.onload = function() {
+        loadNextImage();
+        updateStatus();
+        resizeCanvas(); // 确保初始加载时 canvas 适应屏幕大小
+        };
+    </script>
+</body>
 </html>
