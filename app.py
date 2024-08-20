@@ -12,14 +12,14 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)  # 用於會話加密的密鑰
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://april0909:c7CslksYkeusqcvAkMecoFDQPIFuiPKp@dpg-cqcj0sg8fa8c73crb3u0-a.oregon-postgres.render.com/data_uire"
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://april0909:TevhMabtcGLrRlyn1rqrnfVcI5sVIKsH@dpg-cr1ljs5umphs73afhad0-a.oregon-postgres.render.com/data_0ol7"
 
 db = SQLAlchemy(app)
 socketio = SocketIO(app , cors_allowed_origins="*") # cors_allowed_origins="*" 可以允許任何来源的跨域請求。
 
 # 連線資料庫的table
 class pic(db.Model):
-    __tablename__='images'
+    __tablename__='color_blind_question_pic'
     id=db.Column(db.Integer,primary_key=True)
     image_data=db.Column(db.String(150))
 
@@ -27,7 +27,7 @@ class pic(db.Model):
         self.image_data = image_data
 
 class ans(db.Model):
-    __tablename__='user_ans'
+    __tablename__='color_blind_ans_pic'
     id = db.Column(db.Integer, primary_key=True)
     image_data = db.Column(db.LargeBinary)
 
