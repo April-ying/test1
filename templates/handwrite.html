@@ -71,8 +71,10 @@
     <!-- 確認送出的按鈕 -->
     <button onclick="saveImage()">確認送出</button>
 </div>
-
+<script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
 <script>
+    // 初始化 WebSocket 連接
+    var socket = io.connect('https://test3-oq3k.onrender.com');
     // 設定總題數
     var totalQuestions = 10;
     // 設定已完成的題數
@@ -162,11 +164,12 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ image: dataURL }) // 將圖像數據發送到伺服器
+                body: JSON.stringify({ image: dataURL,
+                                       completedQuestions:completedQuestions
+                 }) // 將圖像數據發送到伺服器
             })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
                 completedQuestions++;
                 updateStatus(); // 更新顯示的題數狀態
                 if (completedQuestions < totalQuestions) {
@@ -189,6 +192,7 @@
             if (data.nextImageUrl) {
                 context.clearRect(0, 0, canvas.width, canvas.height); // 清空 canvas
                 canvas.style.backgroundImage = 'url(' + data.nextImageUrl + ')'; // 設定新圖片作為背景
+                socket.emit('img-connect', {'background-image': data.nextImageUrl});
             } else {
                 console.error('Error: no image URL returned');
             }
